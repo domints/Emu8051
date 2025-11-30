@@ -75,5 +75,77 @@ namespace Emu8051.Net.Tests.Instructions
             Assert.Equal(0xef, mem.Accumulator);
             Assert.Equal(0xab, mem.RAM[0x09]);
         }
+
+        [Fact]
+        public void ExchangeRelativeBank0()
+        {
+            var mem = new Memory(256);
+            mem.LoadRom(new byte[] { 0xC6 });
+            mem.Accumulator = 0xab;
+            mem.ProgramCounter = 0x00;
+            mem.SFR.CurrentBank = 0;
+            mem.RAM[0x00] = 0x08;
+            mem.RAM[0x08] = 0xcd;
+            var instr = new ExchangeAtR(0);
+
+            instr.Execute(mem);
+
+            Assert.Equal(0xcd, mem.Accumulator);
+            Assert.Equal(0xab, mem.RAM[0x08]);
+        }
+
+        [Fact]
+        public void ExchangeRelativeBank1()
+        {
+            var mem = new Memory(256);
+            mem.LoadRom(new byte[] { 0xC6 });
+            mem.Accumulator = 0xab;
+            mem.ProgramCounter = 0x00;
+            mem.SFR.CurrentBank = 1;
+            mem.RAM[0x08] = 0x10;
+            mem.RAM[0x10] = 0xcd;
+            var instr = new ExchangeAtR(0);
+
+            instr.Execute(mem);
+
+            Assert.Equal(0xcd, mem.Accumulator);
+            Assert.Equal(0xab, mem.RAM[0x10]);
+        }
+
+        [Fact]
+        public void ExchangeRelative1Bank0()
+        {
+            var mem = new Memory(256);
+            mem.LoadRom(new byte[] { 0xC7 });
+            mem.Accumulator = 0xab;
+            mem.ProgramCounter = 0x00;
+            mem.SFR.CurrentBank = 0;
+            mem.RAM[0x01] = 0x08;
+            mem.RAM[0x08] = 0xcd;
+            var instr = new ExchangeAtR(1);
+
+            instr.Execute(mem);
+
+            Assert.Equal(0xcd, mem.Accumulator);
+            Assert.Equal(0xab, mem.RAM[0x08]);
+        }
+
+        [Fact]
+        public void ExchangeRelativeHighMem()
+        {
+            var mem = new Memory(256);
+            mem.LoadRom(new byte[] { 0xC6 });
+            mem.Accumulator = 0xab;
+            mem.ProgramCounter = 0x00;
+            mem.SFR.CurrentBank = 0;
+            mem.RAM[0x00] = 0xde;
+            mem.RAM[0xde] = 0xcd;
+            var instr = new ExchangeAtR(0);
+
+            instr.Execute(mem);
+
+            Assert.Equal(0xcd, mem.Accumulator);
+            Assert.Equal(0xab, mem.RAM[0xde]);
+        }
     }
 }
